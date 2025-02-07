@@ -40,6 +40,10 @@ s.token
 s.appid
 ```
 
+You can also use directly the login.py script, it will handle the OTP and print your Token and App ID
+
+`python login.py`
+
 ### Future logins
 
 Simply pass your token and appid when instantiating the session
