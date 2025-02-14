@@ -36,21 +36,24 @@ def clean_name(str):
 
 def mqtt_on_message(client, userdata, message):
     LOGGER.info("(MQTT) Messagge received: '%s': %s", message.topic, message.payload.decode())
-    program_name = message.topic.split("/")[-2]
-    program_id = programs_ids.get(program_name, 'error')
-    if programs_allow_enable:
-        if program_id == 'error':
-            LOGGER.error("(pytcs) Program not found")
-        else:
-            payload = message.payload.decode().lower()
-            if payload == 'on':
-                LOGGER.info("(pytcs) Enable program '%s' (id=%d)", program_name, program_id)
-                s.enable_program(program_id)
-            elif payload == 'off':
-                LOGGER.info("(pytcs) Disable program '%s' (id=%d)", program_name, program_id)
-                s.disable_program(program_id)
+    try:
+        program_name = message.topic.split("/")[-2]
+        program_id = programs_ids.get(program_name, 'error')
+        if programs_allow_enable:
+            if program_id == 'error':
+                LOGGER.error("(pytcs) Program not found")
             else:
-                LOGGER.error("(pytcs) Wrong payload")
+                payload = message.payload.decode().lower()
+                if payload == 'on':
+                    LOGGER.info("(pytcs) Enable program '%s' (id=%d)", program_name, program_id)
+                    s.enable_program(program_id)
+                elif payload == 'off':
+                    LOGGER.info("(pytcs) Disable program '%s' (id=%d)", program_name, program_id)
+                    s.disable_program(program_id)
+                else:
+                    LOGGER.error("(pytcs) Wrong payload")
+    except Exception as e:
+        LOGGER.exception(e)
 
 if __name__ == "__main__":
     LOGGER.info("START")
