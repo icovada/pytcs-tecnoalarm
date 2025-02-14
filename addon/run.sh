@@ -11,11 +11,6 @@ export TCS_PASSWORD="$(bashio::config 'tcs_password')"
 export TCS_SERIAL="$(bashio::config 'tcs_serial')"
 export TCS_TOKEN="$(bashio::config 'tcs_token')"
 
-ls /data
 touch /data/tcsSession.json
-ls /data
-
-cat /data/options.json
-cat /data/tcsSession.json
 
 python3 /main.py

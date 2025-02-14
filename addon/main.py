@@ -63,10 +63,7 @@ def on_connect(client, userdata, flags, reason_code, properties):
 		topic = "{}/{}/{}/set".format(mqtt_topic_base, mqtt_topic_program, progData['name'])
 		res, mid = client.subscribe(topic)
 		logger.info('Subscribing to ' + topic + ': result(' + str(res) + ') id(' + str(mid) + ')')
-	topic = "tmp/fake"
-	res, mid = client.subscribe(topic)
-	logger.info('Subscribing to ' + topic + ': result(' + str(res) + ') id(' + str(mid) + ')')
-
+	
 def on_message(client, userdata, msg):
 	message = msg.payload.decode("utf-8")
 	logger.info('Received on topic[' + msg.topic + ']: ' + message)
