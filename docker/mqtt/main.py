@@ -1,12 +1,14 @@
+import logging
 import time
 import os
 import json
 import paho.mqtt.client as mqtt
-from datetime import datetime as dt
 
 from pytcs_tecnoalarm import TCSSession
 from pytcs_tecnoalarm.api_models import ZoneStatusEnum
+from logger import get_logger
 
+debug = os.getenv("DEBUG", "true").lower() == "true"
 session_key = os.getenv("SESSION_KEY")
 app_id = int(os.getenv("APPID"))
 serial = os.getenv("SERIAL")
@@ -26,52 +28,52 @@ mqtt_topic_centrale = "centrale"
 mqtt_topic_zone = "zones"
 mqtt_topic_program = "programs"
 
+LOGGER = get_logger("")
+LOGGER.setLevel(logging.DEBUG if debug else logging.INFO)
+
 def clean_name(str):
     return str.replace(" ", "_").replace(".", "_").replace("-", "_").lower()
 
-def log(name, message):
-    print(f"{dt.now()} [{name}] {message}")
-
 def mqtt_on_message(client, userdata, message):
-    log("MQTT", f"Messagge received: '{message.topic}': {message.payload.decode()}")
+    LOGGER.info("(MQTT) Messagge received: '%s': %s", message.topic, message.payload.decode())
     program_name = message.topic.split("/")[-2]
     program_id = programs_ids.get(program_name, 'error')
     if programs_allow_enable:
         if program_id == 'error':
-            log("pytcs", "ERROR program not found")
+            LOGGER.error("(pytcs) Program not found")
         else:
             payload = message.payload.decode().lower()
             if payload == 'on':
-                log("pytcs", f"Enable program '{program_name}' (id={program_id})")
+                LOGGER.info("(pytcs) Enable program '%s' (id=%d)", program_name, program_id)
                 s.enable_program(program_id)
             elif payload == 'off':
-                log("pytcs", f"Disable program '{program_name}' (id={program_id})")
+                LOGGER.info("(pytcs) Disable program '%s' (id=%d)", program_name, program_id)
                 s.disable_program(program_id)
             else:
-                log("pytcs", "ERROR wrong payload")
+                LOGGER.error("(pytcs) Wrong payload")
 
 if __name__ == "__main__":
-    log("main", "START")
+    LOGGER.info("START")
     s = TCSSession(session_key, app_id)
 
-    log("pytcs", "get_centrali")
+    LOGGER.debug("(pytcs) get_centrali")
     s.get_centrali()
     centrale = s.centrali[serial]
 
-    log("pytcs", "select_centrale")
+    LOGGER.debug("(pytcs) select_centrale")
     s.select_centrale(centrale.tp)
 
-    log("MQTT", "Connect")
+    LOGGER.info("(MQTT) Connect")
     mqttClient = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     mqttClient.username_pw_set(mqtt_username, mqtt_password)
     mqttClient.connect(mqtt_host, mqtt_port, sleep + 60)
 
     if multiple_tcs:
         mqtt_topic_base += "/" + serial
-        log("MQTT", "Support multiple tcs")
+        LOGGER.info("(MQTT) Support multiple tcs")
 
     if programs_allow_enable:
-        log("MQTT", "Subscribe to messages")
+        LOGGER.info("(MQTT) Subscribe to messages")
         mqttClient.on_message = mqtt_on_message
         p = s.get_programs()
         programs_ids = {}
@@ -93,8 +95,8 @@ if __name__ == "__main__":
     mqttClient.loop_start()
 
     while True:
-        log("main", "----------------")
-        log("pytcs", "get_zones")
+        LOGGER.debug("----------------")
+        LOGGER.debug("(pytcs) get_zones")
         z = s.get_zones()
         for zone in z.root:
             if zone.status == ZoneStatusEnum.UNKNOWN or not zone.allocated:
@@ -105,7 +107,7 @@ if __name__ == "__main__":
             message = json.dumps(zone.__dict__)
             res = mqttClient.publish(topic, message, mqtt_qos, mqtt_retain)
 
-        log("pytcs", "get_programs")
+        LOGGER.debug("(pytcs) get_programs")
         p = s.get_programs()
         for programstatus, programdata in zip(p.root, centrale.tp.status.programs):
             if len(programdata.zones) == 0:
