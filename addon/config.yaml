@@ -13,20 +13,18 @@ map:
   - type: share
     read_only: False
 options:
-  mqtt_config:
-    mqtt_host: "localhost"
-    mqtt_port: 1883
+  mqtt_host: "localhost"
+  mqtt_port: 1883
+  mqtt_username: "username"
+  mqtt_password: "password"
+  tcs_serial: "123456789"
+  tcs_username: "username"
+  tcs_password: "password"
 schema:
-  mqtt_config:
-    mqtt_host: str
-    mqtt_port: int
-    logins:
-      - mqtt_username: str
-        mqtt_password: str
-  tcs_config:
-    tcs_serial: str(0,9)
-    logins:
-      - tcs_username: str
-        tcs_password: str
-    tcs_token: "str?"
-
+  mqtt_host: str
+  mqtt_port: int         
+  mqtt_username: str  
+  mqtt_password: str  
+  tcs_serial: str    
+  tcs_username: str  
+  tcs_password: str 
