@@ -1,0 +1,26 @@
+configuration:
+  mqtt_host:
+    name: MQTT host
+    description: The mqtt host address.
+  mqtt_port:
+    name: MQTT port
+    description: The mqtt port.  
+  mqtt_username:
+    name: MQTT username
+    description: The mqtt username.
+  mqtt_password:
+    name: MQTT password
+    description: The mqtt user password.
+  tcs_username:
+    name: TCS username
+    description: The Tecnoalarm TCS username.
+  tcs_password:
+    name: TCS password
+    description: The Tecnoalarm TCS password.
+  tcs_serial:
+    name: TCS serial
+    description: The Tecnoalarm TCS serial number.
+  tcs_token:
+    name: TCS token
+    description: The Tecnoalarm TCS token.
+  
