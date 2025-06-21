@@ -1,5 +1,2 @@
-requests
-pydantic
-retry
 paho-mqtt
 pytcs-tecnoalarm
