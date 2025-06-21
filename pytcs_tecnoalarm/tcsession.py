@@ -181,3 +181,11 @@ class TCSSession(Session):
     def disable_remote(self, remote_id: int) -> None:
         r = self.put(f"/tcs/remote/{remote_id}/off", json={})
         assert r.ok
+
+    def isolate_zone(self, zone_id: int) -> None:
+        r = self.put(f"/tcs/zone/{zone_id}/on", json={})
+        assert r.ok
+        
+    def restore_zone(self, zone_id: int) -> None:
+        r = self.put(f"/tcs/zone/{zone_id}/off", json={})
+        assert r.ok
