@@ -26,7 +26,6 @@ class Centrale:
     idx: int
     ip: None
     keys: list
-    monitor: TcsMonitor
     passphTCS: str
     port: int
     programs: list
@@ -163,7 +162,7 @@ class TCSSession(Session):
         r = self.get("/tcs/log/0")
         return TcsLogs.model_validate_json(r.text)
 
-    @retry(tries=10, delay=10)
+    @retry(tries=10, delay=1, backoff=2, max_delay=30)
     def request(self, method, url, *args, **kwargs):
         url = self.base_url + url
         r = super().request(method, url, *args, **kwargs)
