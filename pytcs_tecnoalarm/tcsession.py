@@ -120,12 +120,16 @@ class TCSSession(Session):
         for x in centrali.root:
             self.centrali[x.sn] = Centrale(self, x)
 
-    def select_centrale(self, centrale: TcsTpReply):
-        self.delete("/tcs/tp")
-        if centrale.status is None:
-            r = self.post("/tcs/tp", json=centrale.model_dump())
+    def select_centrale(self, centrale_tp: TcsTpReply):
+        if centrale_tp.status is not None:
+            self.delete("/tcs/tp")
+
+        if centrale_tp.status is None:
+            r = self.post("/tcs/tp", json=centrale_tp.model_dump())
             assert r.ok
 
+            # need to wait for it to load
+            # this is not a matter of retrying on error
             while True:
                 r = self.get("/tcs/tpstatus", params={"quick": "true"})
                 assert r.ok
@@ -135,9 +139,9 @@ class TCSSession(Session):
                 else:
                     time.sleep(0.2)
 
-            centrale.status = TcsTpstatus.model_validate_json(r.text)
+            centrale_tp.status = TcsTpstatus.model_validate_json(r.text)
 
-        req_data = TcsTpRequest.model_validate(centrale.model_dump())
+        req_data = TcsTpRequest.model_validate(centrale_tp.model_dump())
         r = self.post("/tcs/tp", json=req_data.model_dump())
         if not r.ok:
             print(r.json())
