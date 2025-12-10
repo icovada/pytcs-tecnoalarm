@@ -4,7 +4,7 @@ dynamic = ["version"]
 authors = [
   { name="Federico Tabbò", email="federico@tabbo.it" },
 ]
-description = "LIbrary to interact with Tecnoalarm TCS app backend"
+description = "Library to interact with Tecnoalarm TCS app backend"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [

@@ -9,33 +9,56 @@ Set up the `.env` file (as the `.env.example`) with all the required variables f
 
 ### Docker Compose
 
-A `docker-compose.yml` file is provided to start up the environment
+A `docker-compose.yml` file is provided to start up the environment.
+
+Build (only the first time): `docker compose build tecnoalarm`
+
+Run: `docker compose up -d`
 
 ## Home Assistant 
 
-MQTT Sensors configuration:
+MQTT window sensor and a (very basic) program configuration examples:
 
 ```yaml
 mqtt:
-  - name: "Room window"
-    unique_id: room_window
-    state_topic: "tecnoalarm/zones/room_window"
-    value_template: "{{ 'ON' if value_json.status == 'OPEN' else 'OFF' }}"
-    device_class: window
-    device:
-      identifiers: tecnoalarm
-      name: Alarm
-      manufacturer: TecnoAlarm
-      model: TP10-42
+  - binary_sensor:
+      - name: "Room window"
+        unique_id: room_window
+        state_topic: "tecnoalarm/zones/room_window"
+        value_template: "{{ 'ON' if value_json.status == 'OPEN' else 'OFF' }}"
+        device_class: window
+        device:
+          identifiers: tecnoalarm
+          name: Alarm
+          manufacturer: TecnoAlarm
+          model: TP10-42
 
-  - name: "Program Total"
-    unique_id: program_total
-    state_topic: "tecnoalarm/programs/total"
-    value_template: "{{ 'ON' if value_json.status.status != 0 else 'OFF' }}"
-    device_class: running
-    device:
-      identifiers: tecnoalarm
-      name: Alarm
-      manufacturer: TecnoAlarm
-      model: TP10-42
+  - alarm_control_panel:
+      - name: "Program Total"
+        unique_id: program_total
+        state_topic: "tecnoalarm/programs/total/status"
+        value_template: "{{ 'armed_away' if value_json.status != 0 else 'disarmed' }}"
+        command_topic: "tecnoalarm/programs/total/set"
+        supported_features:
+        - arm_away
+        code: !secret alarm_password
+        payload_arm_away: "ON"
+        payload_disarm: "OFF"
+        device:
+          identifiers: tecnoalarm
+          name: Alarm
+          manufacturer: TecnoAlarm
+          model: TP10-42
+```
+
+In order to support more than one centrale, the variable `MULTIPLE_TCS` can be set to `True` and the topics will include the `serial` number as the example below:
+
+```yaml
+mqtt:
+  - binary_sensor:
+      - name: "Room window"
+        unique_id: room_window
+        state_topic: "tecnoalarm/<serial>/zones/room_window"
+        value_template: "{{ 'ON' if value_json.status == 'OPEN' else 'OFF' }}"
+        device_class: window
 ```
