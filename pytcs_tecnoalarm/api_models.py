@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel, RootModel, Field, model_validator, field_validator, computed_field
+from typing import Optional
 
 # from tcsession import Centrale
 
@@ -37,7 +38,7 @@ class TcsMonitor(BaseModel):
 
 
 class TcsTpstatusObject(BaseModel):
-    description: str
+    description: Optional[str] = ""
     icon: str
     idx: int
 
