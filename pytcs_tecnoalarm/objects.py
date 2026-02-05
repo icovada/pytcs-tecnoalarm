@@ -1,5 +1,6 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class HandshakeEntrypoint(BaseModel):
@@ -11,13 +12,14 @@ class HandshakeEntrypoint(BaseModel):
 
 class HandshakeAccount(BaseModel):
     accountId: int
-    backupDate: int
-    features: list
-    lastLogin: int
-    subscriptionDate: int
+    backupDate: Optional[int] = None
+    features: Optional[list] = Field(default=None)
+    lastLogin: Optional[int] = None
+    subscriptionDate: Optional[int] = None
 
 
 class HandshakeAnswer(BaseModel):
     appID: int
     entrypoints: list[HandshakeEntrypoint]
     account: HandshakeAccount | None
+
