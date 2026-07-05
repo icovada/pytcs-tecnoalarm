@@ -27,6 +27,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - uses: astral-sh/ruff-action@v3
+    - uses: astral-sh/ruff-action@v4.1.0
     - run: ruff check --fix
     - run: ruff format
